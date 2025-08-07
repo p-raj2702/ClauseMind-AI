@@ -1,0 +1,7 @@
+Policy Conditions:
+
+1. This policy covers hospitalization due to surgery.
+2. Eligible age: 18 to 65 years.
+3. Knee surgery is covered after a 3-month waiting period.
+4. Coverage includes hospitals located in Pune.
+5. Claims are subject to submission of required documents.
