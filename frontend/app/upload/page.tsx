@@ -6,19 +6,40 @@ import { Button } from "@/components/ui/button";
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
+      setMessage("");
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!file) return;
+
+    setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
-    console.log("Uploading:", file.name);
-    // ✅ Replace with your backend upload logic
+
+    try {
+      const res = await fetch("http://localhost:8000/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const data = await res.json();
+      console.log("✅ Upload successful:", data);
+      setMessage("✅ Upload successful! Parsed " + data.num_clauses + " clauses.");
+    } catch (err) {
+      console.error("❌ Upload error:", err);
+      setMessage("❌ Upload failed. Try again.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -54,11 +75,17 @@ export default function UploadPage() {
 
         <Button
           onClick={handleUpload}
-          disabled={!file}
+          disabled={!file || uploading}
           className="w-full py-5 text-lg bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-xl transition disabled:opacity-50"
         >
-          🚀 Upload & Process
+          {uploading ? "⏳ Uploading..." : "🚀 Upload & Process"}
         </Button>
+
+        {message && (
+          <div className="text-center text-sm font-medium text-yellow-800 mt-2">
+            {message}
+          </div>
+        )}
       </div>
     </div>
   );
